@@ -64,6 +64,29 @@ def threshold(label, location, size, material):
     cube_actor(label, location, size, material, collision=False)
 
 
+def try_spawn_dynamic_door(label, location, door_size, closed_offset, travel_offset, phase_offset=0.0):
+    door_class = getattr(unreal, "PortalDemoMovingDoor", None)
+    if not door_class:
+        unreal.log_warning("PortalDemoMovingDoor class is unavailable; skipping dynamic door spawn.")
+        return None
+
+    door = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        door_class,
+        unreal.Vector(*location),
+        unreal.Rotator(0.0, 0.0, 0.0),
+    )
+    door.set_actor_label(label)
+    door.set_editor_property("DoorSize", unreal.Vector(*door_size))
+    door.set_editor_property("ClosedPanelOffset", unreal.Vector(*closed_offset))
+    door.set_editor_property("DoorTravelOffset", unreal.Vector(*travel_offset))
+    door.set_editor_property("ClosedHoldSeconds", 1.0)
+    door.set_editor_property("TravelSeconds", 1.8)
+    door.set_editor_property("OpenHoldSeconds", 1.35)
+    door.set_editor_property("PhaseOffsetSeconds", phase_offset)
+    door.set_editor_property("PreviewOpenFraction", 0.0)
+    return door
+
+
 def build_layout():
     grid = asset(GRID_MAT_PATH)
     dark = asset(DARK_MAT_PATH)
@@ -129,10 +152,30 @@ def build_layout():
     threshold("P05_Corridor_Machinery", (1500.0, 300.0, 5.0), (360.0, 26.0, 10.0), accent)
     threshold("P06_Corridor_Listening", (2100.0, 0.0, 5.0), (26.0, 280.0, 10.0), accent)
 
-    # Collision door samples for later open-fraction testing.
-    cube_actor("Door_P01_HalfOpen", (135.0, 718.0, 118.0), (150.0, 18.0, 236.0), accent)
-    cube_actor("Door_P03_Sliding", (-918.0, 105.0, 118.0), (18.0, 110.0, 236.0), accent)
-    cube_actor("Door_P05_Partial", (1600.0, 318.0, 118.0), (105.0, 18.0, 236.0), accent)
+    # Dynamic P01 door is the first visible proof of portal openness changing over time.
+    try_spawn_dynamic_door(
+        "DynamicDoor_P01_AtriumReverb",
+        (0.0, 720.0, 140.0),
+        (560.0, 40.0, 280.0),
+        (-280.0, 0.0, -140.0),
+        (620.0, 0.0, 0.0),
+    )
+    try_spawn_dynamic_door(
+        "DynamicDoor_P03_ControlAtrium",
+        (-920.0, 0.0, 140.0),
+        (40.0, 400.0, 280.0),
+        (0.0, -200.0, -140.0),
+        (0.0, 460.0, 0.0),
+        phase_offset=1.6,
+    )
+    try_spawn_dynamic_door(
+        "DynamicDoor_P05_CorridorMachinery",
+        (1500.0, 320.0, 140.0),
+        (420.0, 40.0, 280.0),
+        (-210.0, 0.0, -140.0),
+        (470.0, 0.0, 0.0),
+        phase_offset=3.0,
+    )
 
     # Small markers only. No labels, no giant frames.
     threshold("Source_A_Courtyard", (600.0, -1250.0, 20.0), (80.0, 80.0, 40.0), accent)

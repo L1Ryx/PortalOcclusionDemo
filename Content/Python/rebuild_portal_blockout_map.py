@@ -24,6 +24,9 @@ def destroy_generated_environment_actors():
                 "Soft Sky Light",
                 "Default Sky Atmosphere",
                 "Light Atmosphere Fog",
+                "DynamicDoor_P01_AtriumReverb",
+                "DynamicDoor_P03_ControlAtrium",
+                "DynamicDoor_P05_CorridorMachinery",
             }
         ):
             unreal.EditorLevelLibrary.destroy_actor(actor)
@@ -37,6 +40,24 @@ def spawn_actor(actor_class, label, location, rotation=None):
     )
     actor.set_actor_label(label)
     return actor
+
+
+def spawn_dynamic_door(label, location, door_size, closed_offset, travel_offset, phase_offset=0.0):
+    door_class = getattr(unreal, "PortalDemoMovingDoor", None)
+    if not door_class:
+        unreal.log_warning("PortalDemoMovingDoor class is unavailable; skipping dynamic door spawn.")
+        return None
+
+    door = spawn_actor(door_class, label, unreal.Vector(*location))
+    door.set_editor_property("DoorSize", unreal.Vector(*door_size))
+    door.set_editor_property("ClosedPanelOffset", unreal.Vector(*closed_offset))
+    door.set_editor_property("DoorTravelOffset", unreal.Vector(*travel_offset))
+    door.set_editor_property("ClosedHoldSeconds", 1.0)
+    door.set_editor_property("TravelSeconds", 1.8)
+    door.set_editor_property("OpenHoldSeconds", 1.35)
+    door.set_editor_property("PhaseOffsetSeconds", phase_offset)
+    door.set_editor_property("PreviewOpenFraction", 0.0)
+    return door
 
 
 def main():
@@ -64,6 +85,30 @@ def main():
         "Player Start - Control Room",
         unreal.Vector(-1280.0, -150.0, 92.0),
         unreal.Rotator(0.0, 0.0, 0.0),
+    )
+
+    spawn_dynamic_door(
+        "DynamicDoor_P01_AtriumReverb",
+        (0.0, 720.0, 140.0),
+        (560.0, 40.0, 280.0),
+        (-280.0, 0.0, -140.0),
+        (620.0, 0.0, 0.0),
+    )
+    spawn_dynamic_door(
+        "DynamicDoor_P03_ControlAtrium",
+        (-920.0, 0.0, 140.0),
+        (40.0, 400.0, 280.0),
+        (0.0, -200.0, -140.0),
+        (0.0, 460.0, 0.0),
+        phase_offset=1.6,
+    )
+    spawn_dynamic_door(
+        "DynamicDoor_P05_CorridorMachinery",
+        (1500.0, 320.0, 140.0),
+        (420.0, 40.0, 280.0),
+        (-210.0, 0.0, -140.0),
+        (470.0, 0.0, 0.0),
+        phase_offset=3.0,
     )
 
     sun = spawn_actor(
