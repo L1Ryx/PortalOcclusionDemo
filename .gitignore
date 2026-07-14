@@ -1,0 +1,77 @@
+# Unreal generated folders
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Local IDE/project files
+.vscode/
+.idea/
+*.xcworkspace
+*.xcodeproj
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Logs and crash data
+*.log
+*.dmp
+*.crash
+
+# Unreal autosaves/backups
+Saved/Autosaves/
+Saved/Backup/
+Saved/Logs/
+Saved/Crashes/
+
+# Build artifacts
+*.target
+*.modules
+*.version
+*.exp
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.o
+*.a
+*.dylib
+*.dll
+*.so
+*.exe
+*.app
+
+# Packaged builds
+Windows/
+Mac/
+Linux/
+IOS/
+Android/
+Builds/
+Releases/
+
+# Rider / JetBrains
+*.DotSettings.user
+
+# Visual Studio Code local history/extensions
+.history/
+
+# Optional: local plugin generated files
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+Plugins/*/Saved/
