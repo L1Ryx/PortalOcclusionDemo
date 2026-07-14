@@ -15,6 +15,13 @@ def asset(path):
     return loaded
 
 
+def try_set_editor_property(obj, property_name, value):
+    try:
+        obj.set_editor_property(property_name, value)
+    except Exception:
+        unreal.log_warning(f"Could not set {property_name} on {obj.get_name()}.")
+
+
 def clear_level():
     for actor in list(unreal.EditorLevelLibrary.get_all_level_actors()):
         unreal.EditorLevelLibrary.destroy_actor(actor)
@@ -146,7 +153,10 @@ def build_layout():
         unreal.Rotator(-45.0, -35.0, 0.0),
     )
     sun.set_actor_label("Key_DirectionalLight")
-    sun.get_component_by_class(unreal.DirectionalLightComponent).set_editor_property("intensity", 2.0)
+    sun_component = sun.get_component_by_class(unreal.DirectionalLightComponent)
+    sun_component.set_editor_property("intensity", 2.0)
+    try_set_editor_property(sun_component, "atmosphere_sun_light", True)
+    try_set_editor_property(sun_component, "atmosphere_sun_light_index", 0)
 
     sky = unreal.EditorLevelLibrary.spawn_actor_from_class(
         unreal.SkyLight,
@@ -154,6 +164,12 @@ def build_layout():
     )
     sky.set_actor_label("Soft_SkyLight")
     sky.get_component_by_class(unreal.SkyLightComponent).set_editor_property("intensity", 0.65)
+
+    atmosphere = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        unreal.SkyAtmosphere,
+        unreal.Vector(0.0, 0.0, 0.0),
+    )
+    atmosphere.set_actor_label("Default_SkyAtmosphere")
 
 
 def main():

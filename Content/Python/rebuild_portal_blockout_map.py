@@ -5,6 +5,13 @@ FIRST_PERSON_LEVEL = "/Game/FirstPerson/Lvl_FirstPerson"
 PORTAL_LEVEL = "/Game/PortalOcclusion/L_PortalOcclusion_Blockout"
 
 
+def try_set_editor_property(obj, property_name, value):
+    try:
+        obj.set_editor_property(property_name, value)
+    except Exception:
+        unreal.log_warning(f"Could not set {property_name} on {obj.get_name()}.")
+
+
 def destroy_generated_environment_actors():
     for actor in unreal.EditorLevelLibrary.get_all_level_actors():
         class_name = actor.get_class().get_name()
@@ -15,6 +22,7 @@ def destroy_generated_environment_actors():
             or label in {
                 "Key Directional Light",
                 "Soft Sky Light",
+                "Default Sky Atmosphere",
                 "Light Atmosphere Fog",
             }
         ):
@@ -64,7 +72,10 @@ def main():
         unreal.Vector(0.0, 0.0, 900.0),
         unreal.Rotator(-45.0, -35.0, 0.0),
     )
-    sun.get_component_by_class(unreal.DirectionalLightComponent).set_editor_property("intensity", 2.2)
+    sun_component = sun.get_component_by_class(unreal.DirectionalLightComponent)
+    sun_component.set_editor_property("intensity", 2.2)
+    try_set_editor_property(sun_component, "atmosphere_sun_light", True)
+    try_set_editor_property(sun_component, "atmosphere_sun_light_index", 0)
 
     sky = spawn_actor(
         unreal.SkyLight,
@@ -72,6 +83,12 @@ def main():
         unreal.Vector(0.0, 0.0, 400.0),
     )
     sky.get_component_by_class(unreal.SkyLightComponent).set_editor_property("intensity", 0.55)
+
+    spawn_actor(
+        unreal.SkyAtmosphere,
+        "Default Sky Atmosphere",
+        unreal.Vector(0.0, 0.0, 0.0),
+    )
 
     spawn_actor(
         unreal.ExponentialHeightFog,
